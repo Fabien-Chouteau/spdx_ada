@@ -77,16 +77,15 @@ package body SPDX is
             return;
          end if;
 
-         if This.Tokens.Is_Empty
-           or else
-             This.Tokens.First_Element.Kind /= Paren_Close
-         then
+         if This.Tokens.Is_Empty then
             This.Error := Paren_Close_Expected;
-            This.Err_Loc := This.Tokens.First_Element.Loc;
+            This.Err_Loc := (This.Str'Last, This.Str'Last);
             return;
          end if;
 
-         if This.Tokens.Is_Empty then
+         if This.Tokens.First_Element.Kind /= Paren_Close then
+            This.Error := Paren_Close_Expected;
+            This.Err_Loc := This.Tokens.First_Element.Loc;
             return;
          end if;
 

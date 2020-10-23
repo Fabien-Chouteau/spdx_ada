@@ -18,14 +18,14 @@ package SPDX is
      with Pre => Valid (This);
    --  Return the string representation of a valid SPDX expression
 
-   subtype Id_String is String
-     with Dynamic_Predicate => (for all C of Id_String => C in Id_Characters);
-
 private
 
    subtype Id_Characters is Character
      with Dynamic_Predicate => Id_Characters in
        'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | '.';
+
+   subtype Id_String is String
+     with Dynamic_Predicate => (for all C of Id_String => C in Id_Characters);
 
    subtype Whitespace_Characters is Character
      with Dynamic_Predicate => Whitespace_Characters in
