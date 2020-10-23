@@ -80,6 +80,11 @@ begin
    Test ("MIT OR", "Empty license expression at (6:6)");
    Test ("MIT MIT", "Unexpected token at (5:7)");
 
+   Test ("(MIT", "Missing closing parentheses ')' at (2:4)");
+   Test ("MIT)", "Unexpected token at (4:4)");
+   Test ("(MIT AND (MIT OR MIT)", "Missing closing parentheses ')' at (21:21)");
+   Test ("MIT AND (MIT OR MIT))", "Unexpected token at (21:21)");
+
    Put_Line ("PASS:" & Pass_Cnt'Img);
    Put_Line ("FAIL:" & Fail_Cnt'Img);
 
