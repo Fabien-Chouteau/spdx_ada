@@ -81,8 +81,8 @@ package body SPDX is
            or else
              This.Tokens.First_Element.Kind /= Paren_Close
          then
-            This.Error := Paren_Close_Expected;
-            This.Err_Loc := This.Tokens.First_Element.Loc;
+            This.Error:=Paren_Close_Expected;
+            This.Err_Loc:=This.Tokens.First_Element.Loc;
             return;
          end if;
 
