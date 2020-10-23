@@ -54,6 +54,11 @@ package body SPDX is
 
    procedure Parse_Compound_Expression (This : in out Expression) is
    begin
+      --  compound = ( compound )
+      --             | simple
+      --             | simple AND compound
+      --             | simple OR compound
+
       if This.Tokens.Is_Empty then
          This.Error := Empty_Expression;
          This.Err_Loc := (This.Str'Last, This.Str'Last);
@@ -120,6 +125,11 @@ package body SPDX is
 
    procedure Parse_Simple_Expression (This : in out Expression) is
    begin
+      --  simple =   id
+      --           | id+
+      --           | id exception
+      --           | id+ exception
+
       if This.Tokens.Is_Empty then
          This.Error := License_Id_Expected;
          This.Err_Loc := (This.Str'Last, This.Str'Last);
@@ -166,7 +176,9 @@ package body SPDX is
 
    procedure Parse_Exception (This : in out Expression) is
    begin
-      --  WITH license-exception-id
+      --  exception =   <nothing>
+      --              | WITH id
+
       if This.Tokens.First_Element.Kind = Op_With then
 
          This.Tokens.Delete_First;
@@ -207,12 +219,6 @@ package body SPDX is
       Exp.Str := Str;
 
       Tokenize (Exp);
-
-      --  for Tok of Exp.Tokens loop
-      --     Put (Tok.Kind'Img & " ");
-      --  end loop;
-      --  New_Line;
-      --
 
       if Exp.Error /= None then
          return Exp;
