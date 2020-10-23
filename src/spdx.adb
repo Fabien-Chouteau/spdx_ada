@@ -278,7 +278,7 @@ package body SPDX is
             return "License id expected at (" & Img (This.Err_Loc) & ")";
 
          when Invalid_License_Id =>
-            return "Invalid license ID: '" &
+            return "Invalid license ID plop: '" &
               Token_Str (This, This.Err_Loc) & "' (" & Img (This.Err_Loc) & ")";
 
          when Exception_Id_Expected =>
