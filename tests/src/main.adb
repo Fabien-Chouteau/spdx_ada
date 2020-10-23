@@ -43,10 +43,17 @@ procedure Main is
    end Test;
 
 begin
+
+   --  Test all invalid chars
+   for C in Character loop
+      if C not in 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' |
+                  '-' | '.' | '(' | ')' | '+' | ' ' | ASCII.HT
+      then
+         Test ("test" & C, "Invalid character at 5");
+      end if;
+   end loop;
+
    Test ("", "Empty license expression at (0:0)");
-   Test ("test_", "Invalid character at 5");
-   Test ("test&", "Invalid character at 5");
-   Test ("@", "Invalid character at 1");
    Test ("test-3", "Invalid license ID: 'test-3' (1:6)");
    Test ("test-3.0", "Invalid license ID: 'test-3.0' (1:8)");
    Test ("MIT");
