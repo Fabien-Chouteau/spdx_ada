@@ -51,23 +51,29 @@ def gen(package, filename, data, version):
                 file.write("               %s,\n" % To_Ada_Id(lic['id']))
             else:
                 file.write("               %s);\n" % To_Ada_Id(lic['id']))
+        file.write("\n")
+        file.write("   type String_Access is not null access constant String;\n")
+        file.write("   Img_Ptr : constant array (Id) of String_Access :=\n")
+        file.write("     (\n")
+        for i, lic in enumerate(data):
+            if i != len(data) - 1:
+                file.write ("      %s => new String'(%s),\n" % (To_Ada_Id(lic['id']), To_Ada_String(lic['id'])))
+            else:
+                file.write ("      %s => new String'(%s));\n" % (To_Ada_Id(lic['id']), To_Ada_String(lic['id'])))
         file.write("\n");
         file.write("   function Img (I : Id) return String\n")
-        file.write("   is (case I is\n")
+        file.write("   is (Img_Ptr (I).all);\n")
+        file.write("\n");
+        file.write("   Name_Ptr : constant array (Id) of String_Access :=\n")
+        file.write("     (\n")
         for i, lic in enumerate(data):
             if i != len(data) - 1:
-                file.write ("          when %s => %s,\n" % (To_Ada_Id(lic['id']), To_Ada_String(lic['id'])))
+                file.write ("      %s => new String'(%s),\n" % (To_Ada_Id(lic['id']), To_Ada_String(lic['name'])))
             else:
-                file.write ("          when %s => %s);\n" % (To_Ada_Id(lic['id']), To_Ada_String(lic['id'])))
+                file.write ("      %s => new String'(%s));\n" % (To_Ada_Id(lic['id']), To_Ada_String(lic['name'])))
         file.write("\n");
         file.write("   function Name (I : Id) return String\n")
-        file.write("   is (case I is\n")
-        for i, lic in enumerate(data):
-            if i != len(data) - 1:
-                file.write ("          when %s => %s,\n" % (To_Ada_Id(lic['id']), To_Ada_String(lic['name'])))
-            else:
-                file.write ("          when %s => %s);\n" % (To_Ada_Id(lic['id']),
-                                                     To_Ada_String(lic['name'])))
+        file.write("   is (Name_Ptr (I).all);\n")
         file.write("\n");
         file.write("   function Valid_Id (Str : String) return Boolean;\n")
         file.write("   function From_Id (Str : String) return Id;\n")
