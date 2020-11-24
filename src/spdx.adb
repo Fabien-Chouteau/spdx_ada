@@ -9,6 +9,7 @@ package body SPDX is
 
    function Token_Str (This : Expression; Loc : Location) return String;
 
+   function Is_Custom_Id (Str : String) return Boolean;
    procedure Parse_License (This : in out Expression);
    procedure Parse_Compound_Expression (This : in out Expression);
    procedure Parse_Simple_Expression (This : in out Expression);
@@ -29,6 +30,19 @@ package body SPDX is
          return This.Str (Loc.From .. Loc.To);
       end if;
    end Token_Str;
+
+   ------------------
+   -- Is_Custom_Id --
+   ------------------
+
+   function Is_Custom_Id (Str : String) return Boolean is
+      Lower  : constant String := To_Lower (Str);
+      Prefix : constant String := "custom-";
+   begin
+      return Lower'Length > Prefix'Length
+        and then
+          Lower (Lower'First .. Lower'First + Prefix'Length - 1) = Prefix;
+   end Is_Custom_Id;
 
    -------------------
    -- Parse_License --
@@ -145,10 +159,14 @@ package body SPDX is
          License_Id : constant String :=
            Token_Str (This, This.Tokens.First_Element.Loc);
       begin
-         if not SPDX.Licenses.Valid_Id (License_Id) then
+
+         if This.Allow_Custom and then Is_Custom_Id (License_Id) then
+            This.Has_Custom_Id := True;
+         elsif not SPDX.Licenses.Valid_Id (License_Id) then
             This.Error := Invalid_License_Id;
             This.Err_Loc := This.Tokens.First_Element.Loc;
          end if;
+
          This.Tokens.Delete_First;
 
          if This.Tokens.Is_Empty then
@@ -211,11 +229,15 @@ package body SPDX is
    -- Parse --
    -----------
 
-   function Parse (Str : String) return Expression is
+   function Parse (Str          : String;
+                   Allow_Custom : Boolean := False)
+                   return Expression
+   is
       Exp : Expression (Str'Length);
    begin
 
       Exp.Str := Str;
+      Exp.Allow_Custom := Allow_Custom;
 
       Tokenize (Exp);
 
@@ -312,6 +334,13 @@ package body SPDX is
    begin
       return This.Str;
    end Img;
+
+   ----------------
+   -- Has_Custom --
+   ----------------
+
+   function Has_Custom (This : Expression) return Boolean
+   is (This.Has_Custom_Id);
 
    --------------
    -- Tokenize --

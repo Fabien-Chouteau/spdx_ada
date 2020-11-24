@@ -1,6 +1,6 @@
 name = "spdx"
 description = "SPDX License Expression Validator"
-version = "0.1.0"
+version = "0.2.0"
 
 authors = ["Fabien Chouteau"]
 maintainers = ["Fabien Chouteau <chouteau@adacore.com>"]

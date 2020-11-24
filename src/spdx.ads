@@ -4,8 +4,13 @@ package SPDX is
 
    type Expression (<>) is private;
 
-   function Parse (Str : String) return Expression;
-   --  Parse an SPDX expression from string
+   function Parse (Str          : String;
+                   Allow_Custom : Boolean := False)
+                   return Expression;
+   --  Parse an SPDX expression from string.
+   --
+   --  If Allow_Custom is True, the parser will accept custom license id with
+   --  the format: "custom-[0-9a-zA-Z.-]+".
 
    function Valid (This : Expression) return Boolean;
    --  Return True if the SPDX expression is valid
@@ -17,6 +22,9 @@ package SPDX is
    function Img (This : Expression) return String
      with Pre => Valid (This);
    --  Return the string representation of a valid SPDX expression
+
+   function Has_Custom (This : Expression) return Boolean;
+   --  Return True if the expression contains a custom license ID
 
 private
 
@@ -67,6 +75,9 @@ private
 
       Error  : Error_Kind := None;
       Err_Loc : Location;
+
+      Allow_Custom : Boolean := False;
+      Has_Custom_Id : Boolean := False;
    end record;
 
    procedure Tokenize (This : in out Expression)

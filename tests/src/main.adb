@@ -9,12 +9,17 @@ procedure Main is
    Fail_Cnt : Natural := 0;
    Pass_Cnt : Natural := 0;
 
-   procedure Test (Str : String; Expected_Error : String := "");
+   procedure Test (Str            : String;
+                   Expected_Error : String := "";
+                   Allow_Custom   : Boolean := False);
 
-   procedure Test (Str : String; Expected_Error : String := "") is
+   procedure Test (Str            : String;
+                   Expected_Error : String := "";
+                   Allow_Custom   : Boolean := False)
+   is
    begin
       declare
-         Exp : constant SPDX.Expression := SPDX.Parse (Str);
+         Exp : constant SPDX.Expression := SPDX.Parse (Str, Allow_Custom);
          Error : constant String :=
            (if SPDX.Valid (Exp) then "" else SPDX.Error (Exp));
       begin
@@ -29,6 +34,15 @@ procedure Main is
 
             Fail_Cnt := Fail_Cnt + 1;
 
+         elsif Expected_Error = ""
+             and then
+               Allow_Custom
+             and then
+               not SPDX.Has_Custom (Exp)
+         then
+            Put_Line ("FAIL: '" & Str & "'");
+            Put_Line ("   Has_Custom returned False");
+            Fail_Cnt := Fail_Cnt + 1;
          else
             Put_Line ("PASS: '" & Str & "'");
             Pass_Cnt := Pass_Cnt + 1;
@@ -84,6 +98,15 @@ begin
    Test ("MIT)", "Unexpected token at (4:4)");
    Test ("(MIT AND (MIT OR MIT)", "Missing closing parentheses ')' at (21:21)");
    Test ("MIT AND (MIT OR MIT))", "Unexpected token at (21:21)");
+
+   Test ("custom-plop", "Invalid license ID: 'custom-plop' (1:11)", Allow_Custom => False);
+   Test ("custom", "Invalid license ID: 'custom' (1:6)", Allow_Custom => True);
+   Test ("custom-", "Invalid license ID: 'custom-' (1:7)", Allow_Custom => True);
+   Test ("custom-plop", Allow_Custom => True);
+   Test ("custom-plop+", Allow_Custom => True);
+   Test ("custom-test:test", "Invalid character at 12", Allow_Custom => True);
+   Test ("CuStoM-test-1.0.3", Allow_Custom => True);
+   Test ("custom-test AND custom-plop", Allow_Custom => True);
 
    Put_Line ("PASS:" & Pass_Cnt'Img);
    Put_Line ("FAIL:" & Fail_Cnt'Img);
